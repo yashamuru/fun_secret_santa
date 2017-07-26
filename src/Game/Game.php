@@ -24,6 +24,11 @@ class Game implements Contracts\Game
             $msg = sprintf("Secret Santa requires at least 2 players %s provided.", count($this->players));
             throw new \InvalidArgumentException($msg);
         }
+
+        if (count($this->players) != count(array_unique($this->players)))
+        {
+            throw new \InvalidArgumentException("All players must have unique names!");
+        }
     }
 
 }

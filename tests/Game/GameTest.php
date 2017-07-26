@@ -26,6 +26,24 @@ class GameTest extends TestCase {
         $game->play();
     }
 
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testItThrowsErrorWithNonUniquePlayers()
+    {
+        $duplicatePlayer = $this->faker->name;
+        $players = [
+            $this->faker->name,
+            $duplicatePlayer,
+            $this->faker->name,
+            $this->faker->name,
+            $duplicatePlayer
+        ];
+
+        $game = new Game($players);
+        $game->play();
+    }
+
     public function getInvalidGames()
     {
         return [
