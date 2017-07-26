@@ -8,6 +8,22 @@ use SecretSanta\Contracts;
 
 class Game implements Contracts\Game
 {
+
+    /**
+     * @var Contracts\Input
+     */
+    private $input;
+
+    /**
+     * @var Contracts\Output
+     */
+    private $output;
+
+    /**
+     * @var Contracts\Random
+     */
+    private $random;
+
     /**
      * @var array
      */
@@ -27,8 +43,25 @@ class Game implements Contracts\Game
      */
     private $result = array();
 
-    public function __construct(array $players)
+    /**
+     * Game constructor.
+     * @param Contracts\Input $input
+     * @param Contracts\Output $output
+     * @param Contracts\Random $random
+     */
+    public function __construct(Contracts\Input $input, Contracts\Output $output, Contracts\Random $random)
     {
+        $this->input = $input;
+        $this->output = $output;
+        $this->random = $random;
+
+        $this->initialize();
+    }
+
+    private function initialize()
+    {
+        $players = $this->input->read();
+
         $this->players = array_values($players);
         $this->numPlayers = count($players);
         $this->receivers = array_fill(0, $this->numPlayers, false);
@@ -68,7 +101,7 @@ class Game implements Contracts\Game
         }
     }
 
-    public function move(int $buyerIdx)
+    private function move(int $buyerIdx)
     {
         $availableReceivers = $this->getAvailableReceivers($buyerIdx);
         if (empty($availableReceivers)) {
@@ -84,7 +117,7 @@ class Game implements Contracts\Game
         return $receiverIdx;
     }
 
-    public function getAvailableReceivers(int $buyerIdx): array
+    private function getAvailableReceivers(int $buyerIdx): array
     {
         $availableReceivers = array();
         foreach ($this->receivers as $receiverIdx => $value) {
@@ -98,10 +131,10 @@ class Game implements Contracts\Game
         return $availableReceivers;
     }
 
-    public function getRandomElement($array)
+    private function getRandomElement($array)
     {
-        //ToDo - for now.
-        return $array[0];
+        $idx = $this->random->generate(0, count($array) -1);
+        return $array[$idx];
     }
 
     public function getResult(): array
