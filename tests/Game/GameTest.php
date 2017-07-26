@@ -44,6 +44,16 @@ class GameTest extends TestCase {
         $game->play();
     }
 
+    public function testItWorksWithTwoPlayers()
+    {
+        $players = array('Bob', 'Ana');
+        $game = new Game($players);
+        $game->play();
+
+        $result = $game->getResult();
+        $this->assertEquals(['Bob' => 'Ana', 'Ana' => 'Bob'], $result);
+    }
+
     public function getInvalidGames()
     {
         return [

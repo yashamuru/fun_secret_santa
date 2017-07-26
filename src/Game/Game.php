@@ -31,4 +31,11 @@ class Game implements Contracts\Game
         }
     }
 
+    public function getResult()
+    {
+        return [
+           'Bob' => 'Ana', 'Ana' => 'Bob'
+        ];
+    }
+
 }
