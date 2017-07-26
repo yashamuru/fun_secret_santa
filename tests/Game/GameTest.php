@@ -17,6 +17,7 @@ class GameTest extends TestCase
         $this->faker = \Faker\Factory::create();
     }
 
+
     /**
      * @expectedException \InvalidArgumentException
      * @dataProvider getInvalidGames
@@ -60,17 +61,20 @@ class GameTest extends TestCase
     public function getFirstElementPseudoRandomData()
     {
         return [
-            [['Bob', 'Ana'], ['Bob' => 'Ana', 'Ana' => 'Bob']]
+            [['Bob', 'Ana'], ['Bob' => 'Ana', 'Ana' => 'Bob']],
+            [['1', '2', '3'], ['1' => '2', '2' => '3', '3' => '1']]
         ];
     }
 
     public function testItThrowsExceptionWIthThreeElementsAndFirstIndex()
     {
+        $this->markTestSkipped('Case fixed - added in the prev test.');
         $this->expectException(\LogicException::class);
         $players = ['1', '2', '3'];
         $game = new Game($players);
         $game->play();
     }
+
 
     public function getInvalidGames()
     {

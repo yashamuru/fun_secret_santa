@@ -15,6 +15,8 @@ class Game implements Contracts\Game
 
     private $numPlayers = 0;
 
+    private $blackList = array();
+
     /**
      * @var array
      */
@@ -45,27 +47,51 @@ class Game implements Contracts\Game
 
         //Basic play:
         $buyerIdx = 0;
-        while($buyerIdx < $this->numPlayers) {
-            $availableReceivers = $this->getAvailableReceivers($buyerIdx);
-            if (empty($availableReceivers)) {
-                throw new \LogicException('Game crashed - cannot complete the game');
+        $lastReceiverIndex = false;
+        while ($buyerIdx < $this->numPlayers) {
+            try {
+                $lastReceiverIndex = $this->move($buyerIdx);
+                $this->blackList = array();
+            } catch (\LogicException $ex) {
+                if (false === $lastReceiverIndex) {
+                    throw $ex;
+                }
+
+                //Rollback the last step:
+                $buyerIdx--;
+                $this->receivers[$lastReceiverIndex] = false;
+                $this->blackList[$buyerIdx][] = $lastReceiverIndex;
+                $lastReceiverIndex = false;
+                continue;
             }
-            $receiverIdx = $this->getRandomElement($availableReceivers);
-
-            $this->receivers[$receiverIdx] = $buyerIdx;
-
-            $receiverName = $this->players[$receiverIdx];
-            $playerName = $this->players[$buyerIdx];
-            $this->result[$playerName] = $receiverName;
             $buyerIdx++;
         }
+    }
+
+    public function move(int $buyerIdx)
+    {
+        $availableReceivers = $this->getAvailableReceivers($buyerIdx);
+        if (empty($availableReceivers)) {
+            throw new \LogicException('Game crashed - cannot complete the game');
+        }
+        $receiverIdx = $this->getRandomElement($availableReceivers);
+
+        $this->receivers[$receiverIdx] = $buyerIdx;
+
+        $receiverName = $this->players[$receiverIdx];
+        $playerName = $this->players[$buyerIdx];
+        $this->result[$playerName] = $receiverName;
+        return $receiverIdx;
     }
 
     public function getAvailableReceivers(int $buyerIdx): array
     {
         $availableReceivers = array();
         foreach ($this->receivers as $receiverIdx => $value) {
-            if (false === $value && $buyerIdx != $receiverIdx) {
+            if (false === $value
+                && $buyerIdx != $receiverIdx
+                && !in_array($receiverIdx, $this->blackList[$buyerIdx] ?? [])
+            ) {
                 $availableReceivers[] = $receiverIdx;
             }
         }
