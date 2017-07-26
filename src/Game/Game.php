@@ -13,6 +13,8 @@ class Game implements Contracts\Game
      */
     private $players = array();
 
+    private $numPlayers = 0;
+
     /**
      * @var array
      */
@@ -25,11 +27,9 @@ class Game implements Contracts\Game
 
     public function __construct(array $players)
     {
-        $this->players = $players;
-
-        foreach (array_keys($this->players) as $playerIdx) {
-            $this->receivers[$playerIdx] = false;
-        }
+        $this->players = array_values($players);
+        $this->numPlayers = count($players);
+        $this->receivers = array_fill(0, $this->numPlayers, false);
     }
 
     public function play()
@@ -44,7 +44,8 @@ class Game implements Contracts\Game
         }
 
         //Basic play:
-        foreach ($this->players as $buyerIdx => $playerName) {
+        $buyerIdx = 0;
+        while($buyerIdx < $this->numPlayers) {
             $availableReceivers = $this->getAvailableReceivers($buyerIdx);
             if (empty($availableReceivers)) {
                 throw new \LogicException('Game crashed - cannot complete the game');
@@ -54,7 +55,9 @@ class Game implements Contracts\Game
             $this->receivers[$receiverIdx] = $buyerIdx;
 
             $receiverName = $this->players[$receiverIdx];
+            $playerName = $this->players[$buyerIdx];
             $this->result[$playerName] = $receiverName;
+            $buyerIdx++;
         }
     }
 
