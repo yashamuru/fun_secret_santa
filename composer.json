@@ -1,8 +1,9 @@
 {
-    "name": "adsmurai/php-test-senior",
-    "description": "Recruitment test for senior PHP developer",
+    "name": "yashamuru/test_secret_santa",
+    "description": "A secret santa game",
     "require": {
-        "php": "^7.0"
+        "php": "^7.0",
+        "fzaninotto/faker": "^1.6"
     },
     "require-dev": {
         "phpunit/phpunit": "^6.0"
