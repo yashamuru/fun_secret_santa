@@ -8,9 +8,22 @@ use SecretSanta\Contracts;
 
 class Game implements Contracts\Game
 {
+    /**
+     * @var array
+     */
+    private $players;
+
+    public function __construct(array $players)
+    {
+        $this->players = $players;
+    }
+
     public function play()
     {
-        // TODO: Implement play() method.
+        if (count($this->players) <= 1) {
+            $msg = sprintf("Secret Santa requires at least 2 players %s provided.", count($this->players));
+            throw new \InvalidArgumentException($msg);
+        }
     }
 
 }
