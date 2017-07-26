@@ -7,7 +7,8 @@ namespace Tests\Game;
 use PHPUnit\Framework\TestCase;
 use SecretSanta\Game\Game;
 
-class GameTest extends TestCase {
+class GameTest extends TestCase
+{
 
     private $faker;
 
@@ -44,14 +45,31 @@ class GameTest extends TestCase {
         $game->play();
     }
 
-    public function testItWorksWithTwoPlayers()
+    /**
+     * @dataProvider getFirstElementPseudoRandomData
+     */
+    public function testItWorksWhenRandomReturnsFirstElement(array $players, array $expectedResult)
     {
-        $players = array('Bob', 'Ana');
         $game = new Game($players);
         $game->play();
 
         $result = $game->getResult();
-        $this->assertEquals(['Bob' => 'Ana', 'Ana' => 'Bob'], $result);
+        $this->assertEquals($expectedResult, $result);
+    }
+
+    public function getFirstElementPseudoRandomData()
+    {
+        return [
+            [['Bob', 'Ana'], ['Bob' => 'Ana', 'Ana' => 'Bob']]
+        ];
+    }
+
+    public function testItThrowsExceptionWIthThreeElementsAndFirstIndex()
+    {
+        $this->expectException(\LogicException::class);
+        $players = ['1', '2', '3'];
+        $game = new Game($players);
+        $game->play();
     }
 
     public function getInvalidGames()

@@ -13,7 +13,6 @@ class Game implements Contracts\Game
      */
     private $players = array();
 
-
     /**
      * @var array
      */
@@ -47,6 +46,9 @@ class Game implements Contracts\Game
         //Basic play:
         foreach ($this->players as $buyerIdx => $playerName) {
             $availableReceivers = $this->getAvailableReceivers($buyerIdx);
+            if (empty($availableReceivers)) {
+                throw new \LogicException('Game crashed - cannot complete the game');
+            }
             $receiverIdx = $this->getRandomElement($availableReceivers);
 
             $this->receivers[$receiverIdx] = $buyerIdx;
@@ -76,10 +78,6 @@ class Game implements Contracts\Game
     public function getResult(): array
     {
         return $this->result;
-
-        return [
-            'Bob' => 'Ana', 'Ana' => 'Bob'
-        ];
     }
 
 }
