@@ -10,7 +10,11 @@ class Random implements Contracts\Random
 {
     public function generate(int $min, int $max): int
     {
-        // TODO: Implement generate() method.
-    }
+        if ($min > $max) {
+            $msg = sprintf('Random - Min(%s) should not be bigger than Max(%s)',$min, $max);
+            throw new \InvalidArgumentException($msg);
+        }
 
+        return mt_rand($min, $max);
+    }
 }

@@ -9,10 +9,7 @@ use SecretSanta\Game\Output;
 
 class OutputTest extends TestCase
 {
-    /**
-     * @dataProvider  getValidInputItems
-     */
-    public function testItOutputsAsExpected($items, $expectedOutput)
+    public function testItOutputsAsExpected()
     {
         $string = "Some text";
         ob_start();
