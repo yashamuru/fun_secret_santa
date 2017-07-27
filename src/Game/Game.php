@@ -80,25 +80,45 @@ class Game implements Contracts\Game
 
         //Basic play:
         $buyerIdx = 0;
-        $lastReceiverIndex = false;
+        $receiverIdx = -1;
         while ($buyerIdx < $this->numPlayers) {
             try {
-                $lastReceiverIndex = $this->move($buyerIdx);
+                $receiverIdx = $this->move($buyerIdx);
                 $this->blackList = array();
+                $this->applyMove($buyerIdx, $receiverIdx);
+
             } catch (\LogicException $ex) {
-                if (false === $lastReceiverIndex) {
+                if (-1 == $receiverIdx) {
                     throw $ex;
                 }
 
                 //Rollback the last step:
                 $buyerIdx--;
-                $this->receivers[$lastReceiverIndex] = false;
-                $this->blackList[$buyerIdx][] = $lastReceiverIndex;
-                $lastReceiverIndex = false;
+                $this->rollbackMove($buyerIdx, $receiverIdx);
+                $receiverIdx = -1;
                 continue;
             }
             $buyerIdx++;
         }
+    }
+
+    private function rollbackMove(int $buyerIdx, int $lastReceiverIndex)
+    {
+        $this->receivers[$lastReceiverIndex] = false;
+
+        $buyerName = $this->players[$buyerIdx];
+        unset($this->result[$buyerName]);
+
+        $this->blackList[$buyerIdx][] = $lastReceiverIndex;
+    }
+
+    private function applyMove(int $buyerIdx, int $receiverIdx)
+    {
+        $this->receivers[$receiverIdx] = $buyerIdx;
+
+        $receiverName = $this->players[$receiverIdx];
+        $buyerName = $this->players[$buyerIdx];
+        $this->result[$buyerName] = $receiverName;
     }
 
     private function move(int $buyerIdx)
@@ -109,11 +129,7 @@ class Game implements Contracts\Game
         }
         $receiverIdx = $this->getRandomElement($availableReceivers);
 
-        $this->receivers[$receiverIdx] = $buyerIdx;
 
-        $receiverName = $this->players[$receiverIdx];
-        $playerName = $this->players[$buyerIdx];
-        $this->result[$playerName] = $receiverName;
         return $receiverIdx;
     }
 
@@ -142,4 +158,9 @@ class Game implements Contracts\Game
         return $this->result;
     }
 
+    public function getOutput(): Contracts\Output
+    {
+        $this->output->setGameResult($this->getResult());
+        return $this->output;
+    }
 }
