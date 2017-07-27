@@ -158,9 +158,11 @@ class Game implements Contracts\Game
         return $this->result;
     }
 
-    public function getOutput(): Contracts\Output
+    public function output(): void
     {
-        $this->output->setGameResult($this->getResult());
-        return $this->output;
+        foreach ($this->result as $buyer => $receiver) {
+            $line = sprintf("%s -> %s", $buyer, $receiver);
+            $this->output->printLine($line);
+        }
     }
 }

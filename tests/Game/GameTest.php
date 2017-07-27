@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Tests\Game;
 
 use PHPUnit\Framework\TestCase;
-use SecretSanta\Game\Game;
+use SecretSanta\Game;
 use SecretSanta\Contracts;
 use Prophecy\Argument;
 
@@ -33,14 +33,14 @@ class GameTest extends TestCase
     {
         $this->faker = \Faker\Factory::create();
         $this->input = $this->prophesize(Contracts\Input::class);
-        $this->output = $this->prophesize(Contracts\Output::class);
+        $this->output = new Game\Output();
         $this->random = $this->prophesize(Contracts\Random::class);
     }
 
-    private function getSut(array $players): Game
+    private function getSut(array $players): Game\Game
     {
         $this->input->read()->willReturn($players);
-        return new Game($this->input->reveal(), $this->output->reveal(), $this->random->reveal());
+        return new Game\Game($this->input->reveal(), $this->output, $this->random->reveal());
     }
     /**
      * @expectedException \InvalidArgumentException
@@ -94,5 +94,21 @@ class GameTest extends TestCase
             [['Bob', 'Ana'], ['Bob' => 'Ana', 'Ana' => 'Bob']],
             [['1', '2', '3'], ['1' => '2', '2' => '3', '3' => '1']]
         ];
+    }
+
+    public function testItOutputsCorrectly()
+    {
+        $this->output = new Game\Output();
+        $this->random->generate(Argument::type('integer'), Argument::type('integer'))->willReturnArgument(0);
+        $players = ['Bob','Ana'];
+        $game = $this->getSut($players);
+
+        ob_start();
+        $game->play();
+        $game->output();
+        $outputResult = ob_get_clean();
+
+        $expectedOutput = "Bob -> Ana".PHP_EOL."Ana -> Bob".PHP_EOL;
+        $this->assertEquals($expectedOutput, $outputResult);
     }
 }

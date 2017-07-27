@@ -10,6 +10,6 @@ class Output implements Contracts\Output
 {
     public function printLine(string $line)
     {
-        // TODO: Implement printLine() method.
+        echo $line.PHP_EOL;
     }
 }
