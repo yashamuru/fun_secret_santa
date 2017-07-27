@@ -1,5 +1,5 @@
 {
-    "name": "yashamuru/test_secret_santa",
+    "name": "yashamuru/fun_secret_santa",
     "description": "A secret santa game",
     "require": {
         "php": "^7.0",
